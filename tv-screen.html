@@ -1,0 +1,66 @@
+<!-- احفظ هذا الكود كـ tv-screen.html وافتحه على تلفازك -->
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 TiTaPa TV Screen</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+            font-size: 2rem;
+        }
+        .ip-address {
+            font-size: 3rem;
+            color: #10b981;
+            margin: 2rem 0;
+            padding: 2rem;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+        }
+        .instructions {
+            font-size: 1.5rem;
+            line-height: 1.6;
+            margin: 2rem 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>📺 TiTaPa TV Screen</h1>
+    
+    <div class="ip-address" id="ipAddress">
+        جاري تحديد العنوان...
+    </div>
+    
+    <div class="instructions">
+        <p>🔹 افتح المتصفح على هاتفك</p>
+        <p>🔹 ادخل العنوان الظاهر أعلاه</p>
+        <p>🔹 استخدم الهاتف للتحكم في هذه الشاشة</p>
+    </div>
+
+    <script>
+        function getLocalIP() {
+            // هذه دالة مبسطة للحصول على IP
+            return new Promise((resolve) => {
+                // في المتصفح لا يمكن الحصول على IP مباشرة
+                // لذا سنستخدم عنوان الصفحة الحالي
+                const url = window.location.href;
+                const domain = url.split('/')[2].split(':')[0];
+                resolve(domain === 'localhost' ? '192.168.1.100' : domain);
+            });
+        }
+
+        async function showIP() {
+            const ip = await getLocalIP();
+            document.getElementById('ipAddress').textContent = 
+                `http://${ip}:5000`;
+        }
+
+        showIP();
+    </script>
+</body>
+</html>

@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TiTaPa - لوحة التحكم المتعددة اللغات</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #1e40af;
+            --accent: #3b82f6;
+            --dark: #1e293b;
+            --darker: #0f172a;
+            --light: #f8fafc;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --gray: #64748b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Cairo', Tahoma, Geneva, Verdana, sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--darker), var(--dark));
+            color: var(--light);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* اللغة العربية */
+        body[lang="ar"] {
+            direction: rtl;
+            font-family: 'Cairo', 'Segoe UI', sans-serif;
+        }
+
+        /* اللغة الإنجليزية */
+        body[lang="en"] {
+            direction: ltr;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+        }
+
+        /* اللغة التايلندية */
+        body[lang="th"] {
+            direction: ltr;
+            font-family: 'Segoe UI', 'Sarabun', sans-serif;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* شريط اللغة */
+        .language-bar {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            gap: 10px;
+            background: rgba(30, 41, 59, 0.9);
+            padding: 10px 15px;
+            border-radius: 25px;
+            backdrop-filter: blur(10px);
+        }
+
+        .lang-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--light);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .lang-btn:hover, .lang-btn.active {
+            background: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        /* الهيدر */
+        .header {
+            text-align: center;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .logo h1 {
+            font-size: 3rem;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: var(--gray);
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        /* لوحة الاتصال */
+        .connection-panel {
+            background: rgba(30, 41, 59, 0.8);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+            text-align: center;
+        }
+
+        .ip-section {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .ip-input {
+            padding: 15px 20px;
+            border: none;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 16px;
+            min-width: 250px;
+        }
+
+        .connect-btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+
+        .connect-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(37, 99, 235, 0.4);
+        }
+
+        .status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            padding: 1.5rem;
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 15px;
+            margin: 1rem 0;
+            font-size: 1.1rem;
+        }
+
+        .status-dot {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: var(--danger);
+        }
+
+        .status-dot.connected {
+            background: var(--success);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* لوحة اللمس */
+        .touch-section {
+            background: rgba(30, 41, 59, 0.8);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: var(--accent);
+            font-size: 1.5rem;
+        }
+
+        .touch-pad {
+            width: 100%;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            margin: 1rem 0;
+            touch-action: none;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .touch-indicator {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background: rgba(59, 130, 246, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        /* أزرار التحكم */
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .control-btn {
+            padding: 1.2rem;
+            border: none;
+            border-radius: 15px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .control-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3);
+        }
+
+        .control-btn:active {
+            transform: scale(0.95);
+        }
+
+        .control-btn.large {
+            grid-column: span 2;
+            padding: 1.5rem;
+            font-size: 1.3rem;
+        }
+
+        /* إدخال النص */
+        .text-input-section {
+            background: rgba(30, 41, 59, 0.8);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .text-input {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 16px;
+            margin-bottom: 1rem;
+        }
+
+        /* التكيف مع الشاشات الصغيرة */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .logo h1 {
+                font-size: 2rem;
+            }
+            
+            .ip-section {
+                flex-direction: column;
+            }
+            
+            .ip-input {
+                min-width: auto;
+                width: 100%;
+            }
+            
+            .controls-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .language-bar {
+                top: 10px;
+                right: 10px;
+                flex-direction: column;
+            }
+        }
+
+        /* التمرير */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary);
+        }
+    </style>
+</head>
+<body lang="ar">
+    <!-- شريط اللغة -->
+    <div class="language-bar">
+        <button class="lang-btn active" onclick="changeLanguage('ar')">العربية</button>
+        <button class="lang-btn" onclick="changeLanguage('en')">English</button>
+        <button class="lang-btn" onclick="changeLanguage('th')">ไทย</button>
+    </div>
+
+    <div class="container">
+        <!-- الهيدر -->
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-mouse" style="font-size: 2.5rem; color: var(--accent);"></i>
+                <h1 data-i18n="title">TiTaPa التحكم</h1>
+            </div>
+            <p class="subtitle" data-i18n="subtitle">استخدم هاتفك للتحكم في التلفاز والكمبيوتر</p>
+        </div>
+
+        <!-- لوحة الاتصال -->
+        <div class="connection-panel">
+            <h2 class="section-title" data-i18n="connectTitle">الاتصال بالتلفاز</h2>
+            <div class="ip-section">
+                <input type="text" class="ip-input" id="tvIP" placeholder="أدخل IP التلفاز" value="192.168.1.">
+                <button class="connect-btn" onclick="connectToTV()" data-i18n="connectBtn">اتصال</button>
+            </div>
+            
+            <div class="status">
+                <div class="status-dot" id="statusDot"></div>
+                <span id="statusText" data-i18n="statusDisconnected">غير متصل</span>
+            </div>
+
+            <div data-i18n="instructions">
+                <p>🔹 أدخل عنوان IP الظاهر على شاشة التلفاز</p>
+                <p>🔹 تأكد أن الجهازين على نفس الشبكة</p>
+                <p>🔹 اضغط اتصال وابدأ التحكم</p>
+            </div>
+        </div>
+
+        <!-- لوحة اللمس -->
+        <div class="touch-section">
+            <h2 class="section-title" data-i18n="touchTitle">لوحة التحكم باللمس</h2>
+            <div class="touch-pad" id="touchPad">
+                <div class="touch-indicator" id="touchIndicator"></div>
+            </div>
+            <p style="text-align: center; color: var(--gray);" data-i18n="touchInstructions">
+                اسحب لإدارة الماوس - المس للنقر
+            </p>
+        </div>
+
+        <!-- أزرار التحكم -->
+        <div class="controls-grid">
+            <button class="control-btn" ontouchstart="sendAction('click', 'left')" data-i18n="leftClick">
+                🖱️ نقر يسار
+            </button>
+            <button class="control-btn" ontouchstart="sendAction('click', 'right')" data-i18n="rightClick">
+                🖱️ نقر يمين
+            </button>
+            <button class="control-btn" ontouchstart="sendAction('key', 'Enter')" data-i18n="enterKey">
+                ↵ Enter
+            </button>
+            <button class="control-btn" ontouchstart="sendAction('key', 'Escape')" data-i18n="escapeKey">
+                ⎋ Escape
+            </button>
+            <button class="control-btn" onclick="controlMedia('playpause')" data-i18n="playPause">
+                ⏯ تشغيل/إيقاف
+            </button>
+            <button class="control-btn" onclick="controlMedia('volumeup')" data-i18n="volumeUp">
+                🔊+
+            </button>
+            <button class="control-btn" onclick="controlPresentation('prev')" data-i18n="prevSlide">
+                ← السابق
+            </button>
+            <button class="control-btn" onclick="controlPresentation('next')" data-i18n="nextSlide">
+                → التالي
+            </button>
+        </div>
+
+        <!-- إدخال النص -->
+        <div class="text-input-section">
+            <h2 class="section-title" data-i18n="textTitle">إدخال النص</h2>
+            <input type="text" class="text-input" id="textInput" placeholder="اكتب نصاً لإرساله..." data-i18n-placeholder="textPlaceholder">
+            <button class="control-btn large" onclick="sendText()" data-i18n="sendText">
+                📤 إرسال النص
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // بيانات الترجمة متعددة اللغات
+        const translations = {
+            ar: {
+                "title": "TiTaPa التحكم",
+                "subtitle": "استخدم هاتفك للتحكم في التلفاز والكمبيوتر",
+                "connectTitle": "الاتصال بالتلفاز",
+                "connectBtn": "اتصال",
+                "statusDisconnected": "غير متصل",
+                "statusConnected": "متصل",
+                "instructions": "<p>🔹 أدخل عنوان IP الظاهر على شاشة التلفاز</p><p>🔹 تأكد أن الجهازين على نفس الشبكة</p><p>🔹 اضغط اتصال وابدأ التحكم</p>",
+                "touchTitle": "لوحة التحكم باللمس",
+                "touchInstructions": "اسحب لإدارة الماوس - المس للنقر",
+                "leftClick": "🖱️ نقر يسار",
+                "rightClick": "🖱️ نقر يمين",
+                "enterKey": "↵ Enter",
+                "escapeKey": "⎋ Escape",
+                "playPause": "⏯ تشغيل/إيقاف",
+                "volumeUp": "🔊+",
+                "volumeDown": "🔊-",
+                "prevSlide": "← السابق",
+                "nextSlide": "→ التالي",
+                "textTitle": "إدخال النص",
+                "textPlaceholder": "اكتب نصاً لإرساله...",
+                "sendText": "📤 إرسال النص",
+                "connectionSuccess": "✅ تم الاتصال بنجاح!",
+                "connectionError": "❌ خطأ في الاتصال"
+            },
+            en: {
+                "title": "TiTaPa Control",
+                "subtitle": "Use your phone to control TV and computer",
+                "connectTitle": "Connect to TV",
+                "connectBtn": "Connect",
+                "statusDisconnected": "Disconnected",
+                "statusConnected": "Connected",
+                "instructions": "<p>🔹 Enter the IP address shown on TV screen</p><p>🔹 Make sure both devices are on same network</p><p>🔹 Press connect and start controlling</p>",
+                "touchTitle": "Touch Control Pad",
+                "touchInstructions": "Drag to move mouse - Tap to click",
+                "leftClick": "🖱️ Left Click",
+                "rightClick": "🖱️ Right Click",
+                "enterKey": "↵ Enter",
+                "escapeKey": "⎋ Escape",
+                "playPause": "⏯ Play/Pause",
+                "volumeUp": "🔊+",
+                "volumeDown": "🔊-",
+                "prevSlide": "← Previous",
+                "nextSlide": "→ Next",
+                "textTitle": "Text Input",
+                "textPlaceholder": "Type text to send...",
+                "sendText": "📤 Send Text",
+                "connectionSuccess": "✅ Connected successfully!",
+                "connectionError": "❌ Connection error"
+            },
+            th: {
+                "title": "TiTaPa ควบคุม",
+                "subtitle": "ใช้โทรศัพท์ควบคุมทีวีและคอมพิวเตอร์",
+                "connectTitle": "เชื่อมต่อทีวี",
+                "connectBtn": "เชื่อมต่อ",
+                "statusDisconnected": "ไม่ได้เชื่อมต่อ",
+                "statusConnected": "เชื่อมต่อแล้ว",
+                "instructions": "<p>🔹 กรอกที่อยู่ IP ที่แสดงบนหน้าจอทีวี</p><p>🔹 ตรวจสอบว่าทั้งสองอุปกรณ์อยู่ในเครือข่ายเดียวกัน</p><p>🔹 กดเชื่อมต่อและเริ่มควบคุม</p>",
+                "touchTitle": "แผงควบคุมสัมผัส",
+                "touchInstructions": "ลากเพื่อเลื่อนเมาส์ - แตะเพื่อคลิก",
+                "leftClick": "🖱️ คลิกซ้าย",
+                "rightClick": "🖱️ คลิกขวา",
+                "enterKey": "↵ Enter",
+                "escapeKey": "⎋ Escape",
+                "playPause": "⏯ เล่น/หยุด",
+                "volumeUp": "🔊+",
+                "volumeDown": "🔊-",
+                "prevSlide": "← ก่อนหน้า",
+                "nextSlide": "→ ถัดไป",
+                "textTitle": "ป้อนข้อความ",
+                "textPlaceholder": "พิมพ์ข้อความที่จะส่ง...",
+                "sendText": "📤 ส่งข้อความ",
+                "connectionSuccess": "✅ เชื่อมต่อสำเร็จ!",
+                "connectionError": "❌ ข้อผิดพลาดการเชื่อมต่อ"
+            }
+        };
+
+        // المتغيرات العامة
+        let currentLanguage = 'ar';
+        let isConnected = false;
+        let tvIP = '';
+
+        // تغيير اللغة
+        function changeLanguage(lang) {
+            currentLanguage = lang;
+            document.body.setAttribute('lang', lang);
+            document.body.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+            
+            // تحديث الأزرار النشطة
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // تحديث النصوص
+            updateTexts();
+        }
+
+        // تحديث النصوص حسب اللغة
+        function updateTexts() {
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (translations[currentLanguage][key]) {
+                    element.innerHTML = translations[currentLanguage][key];
+                }
+            });
+            
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
+                const key = element.getAttribute('data-i18n-placeholder');
+                if (translations[currentLanguage][key]) {
+                    element.setAttribute('placeholder', translations[currentLanguage][key]);
+                }
+            });
+        }
+
+        // الاتصال بالتلفاز
+        function connectToTV() {
+            const ip = document.getElementById('tvIP').value.trim();
+            if (!ip) {
+                alert(currentLanguage === 'ar' ? '⚠️ الرجاء إدخال IP التلفاز' : 
+                      currentLanguage === 'en' ? '⚠️ Please enter TV IP' : 
+                      '⚠️ กรุณากรอก IP ทีวี');
+                return;
+            }
+
+            tvIP = ip;
+            isConnected = true;
+            
+            document.getElementById('statusDot').classList.add('connected');
+            document.getElementById('statusText').textContent = translations[currentLanguage]['statusConnected'];
+            
+            alert(translations[currentLanguage]['connectionSuccess']);
+        }
+
+        // إرسال الأوامر
+        function sendAction(type, value) {
+            if (!isConnected) {
+                alert(translations[currentLanguage]['connectionError']);
+                return;
+            }
+            
+            console.log(`Sending ${type}: ${value}`);
+            // هنا سيتم إرسال الأمر إلى التلفاز
+        }
+
+        // التحكم في الوسائط
+        function controlMedia(action) {
+            sendAction('media', action);
+        }
+
+        // التحكم في العروض
+        function controlPresentation(action) {
+            sendAction('presentation', action);
+        }
+
+        // إرسال النص
+        function sendText() {
+            const text = document.getElementById('textInput').value.trim();
+            if (!text) {
+                alert(currentLanguage === 'ar' ? '⚠️ الرجاء إدخال نص' : 
+                      currentLanguage === 'en' ? '⚠️ Please enter text' : 
+                      '⚠️ กรุณากรอกข้อความ');
+                return;
+            }
+            
+            sendAction('text', text);
+            document.getElementById('textInput').value = '';
+        }
+
+        // إعداد لوحة اللمس
+        function setupTouchPad() {
+            const touchPad = document.getElementById('touchPad');
+            const touchIndicator = document.getElementById('touchIndicator');
+            let isTouching = false;
+
+            touchPad.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                isTouching = true;
+                showTouchEffect(e.touches[0]);
+            });
+
+            touchPad.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                if (isTouching) {
+                    showTouchEffect(e.touches[0]);
+                }
+            });
+
+            touchPad.addEventListener('touchend', () => {
+                isTouching = false;
+                touchIndicator.style.opacity = '0';
+            });
+
+            function showTouchEffect(touch) {
+                const rect = touchPad.getBoundingClientRect();
+                const x = touch.clientX - rect.left;
+                const y = touch.clientY - rect.top;
+
+                touchIndicator.style.left = `${x}px`;
+                touchIndicator.style.top = `${y}px`;
+                touchIndicator.style.opacity = '1';
+            }
+        }
+
+        // التهيئة عند التحميل
+        document.addEventListener('DOMContentLoaded', function() {
+            setupTouchPad();
+            updateTexts();
+            
+            // إضافة تأثيرات للوحة اللمس
+            const touchPad = document.getElementById('touchPad');
+            touchPad.addEventListener('mouseenter', () => {
+                touchPad.style.borderColor = 'var(--accent)';
+            });
+            
+            touchPad.addEventListener('mouseleave', () => {
+                touchPad.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+            });
+        });
+
+        // منع السلوك الافتراضي
+        document.addEventListener('touchstart', function(e) {
+            if (e.target.tagName !== 'INPUT') {
+                e.preventDefault();
+            }
+        }, { passive: false });
+    </script>
+</body>
+</html>
